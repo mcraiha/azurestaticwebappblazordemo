@@ -1,0 +1,50 @@
+@page "/fetchdata"
+@using BlazorApp.Shared 
+@inject HttpClient Http
+
+<h1>Users</h1>
+
+@if (users == null || users.Length == 0)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>First name</th>
+                <th>Last name</th>
+                <th>Email</th>
+                <th>Roles</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in users)
+            {
+                <tr>
+                    <td>@user.FirstName</td>
+                    <td>@user.LastName</td>
+                    <td>@user.Email</td>
+                    <td>@string.Join(", ", user.Roles);</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private User[] users = new User[]{};
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            users = await Http.GetFromJsonAsync<User[]>("/api/GetUsers") ?? new User[]{};
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+    }
+}
